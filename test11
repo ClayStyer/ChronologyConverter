@@ -1,0 +1,87 @@
+#Right now, it doesnt recognize events that happen on the same day, because
+#it used the abbreviated month names as its method of checking when to break
+#the data. this of course means it skips the entirety of every entry besides
+#the first on a given day
+#best bet seems to be looking ahead for the "see also" 2 lines down
+
+def Pdf2csv(location):
+    source = open(location,'r')
+    input = source.read()
+    switchVar = 0               
+    pagecheckVar = 0
+    pagecheckVar2 = 0
+    findstartVar = 0
+    findStart = 'aaa'
+    dateAbb = "aaa"
+    pageCheck = 'aaaaaaaaaaaaaaaaaaa'
+    pageCheck2 = 'aaaaaaaaaaaaaaaaaaa'
+    text = ''
+    titlestring = ''
+
+    for p in input:
+        findstartVar = findstartVar + 1
+        if p == ':':
+            if input[findstartVar-2] == '1' or input[findstartVar-2] == '2' or input[findstartVar-2] == '3' or input[findstartVar-2] == '4' or input[findstartVar-2] == '5' or input[findstartVar-2] == '6' or input[findstartVar-2] == '7' or input[findstartVar-2] == '8' or input[findstartVar-2] == '9' or input[findstartVar-2] == '0':
+                input = input[(findstartVar - 8):]
+                break
+
+    for x in input:
+        
+        if x == '\n':
+            text = text + ' '
+            
+        elif x == ']':
+            text = text+'|\n'
+            titlestring = ''
+            switchVar = 1
+            
+        elif x == ':':
+            text = text+'|'
+            switchVar = 2
+            
+        elif x == '.' and switchVar == 2:
+            text = text + x
+            text = text+'|'
+            text = text + titlestring
+            switchVar = 3
+            
+        elif x == '[':
+            text = text+'|'
+            switchVar = 4
+            
+        elif switchVar == 2:
+            titlestring = titlestring + x
+            text = text + x
+            
+        else:
+            if switchVar == 1:
+                dateAbb = dateAbb[1:] + x
+                if dateAbb == 'Jan' or dateAbb =='Feb' or dateAbb =='Mar' or dateAbb =='Apr' or dateAbb =='May' or dateAbb =='Jun' or dateAbb =='Jul' or dateAbb =='Aug' or dateAbb =='Sep' or dateAbb =='Oct' or dateAbb =='Nov' or dateAbb =='Dec':
+                    switchVar = 0
+                    text = text + dateAbb
+            else:
+                text = text + x
+                
+
+
+    for n in text:
+        pageCheck = pageCheck[1:] + n
+        pagecheckVar = pagecheckVar + 1
+        if pageCheck == 'MIDDLE EAST JOURNAL':
+            text = text[:(pagecheckVar-25)]+ text[pagecheckVar:]
+            pageCheck = 'aaaaaaaaaaaaaaaaaaa'
+            pagecheckVar = pagecheckVar - 25
+
+    for q in text:
+        pageCheck2 = pageCheck2[1:] + q
+        pagecheckVar2 = pagecheckVar2 + 1
+        if pageCheck2 == 'middle east journal':
+            text = text[:(pagecheckVar2-19)]+ text[(pagecheckVar2+6):]
+            pageCheck2 = 'aaaaaaaaaaaaaaaaaaa'
+            pagecheckVar2 = pagecheckVar2 - 25
+             
+    file = open('\\Users\\Clay\\Desktop\\PyChron\\output12.txt', 'w')
+    file.write(text)
+    file.close()
+
+            
