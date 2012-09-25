@@ -1,0 +1,107 @@
+def Pdf2csv(location):
+    source = open(location,'r')
+    input = source.read()
+    switchCount = 0
+    charCount = 0
+    genericCount = 0
+    switchVar = 0               
+    pagecheckVar = 0
+    pagecheckVar2 = 0
+    findstartVar = 0
+    introAbb = 'aaa'
+    findStart = 'aaa'
+    dateAbb = 'aaa'
+    pageCheck = 'aaaaaaaaaaaaaaaaaaa'
+    pageCheck2 = 'aaaaaaaaaaaaaaaaaaa'
+    sectionCheck = 'aaaaaaaa'
+    sc1 = 0
+    sc2 = 0
+    text = '" '
+    titlestring = ''
+
+    for p in input:
+        findstartVar = findstartVar + 1
+        if p == ':':
+            if input[findstartVar-2] == '1' or input[findstartVar-2] == '2' or input[findstartVar-2] == '3' or input[findstartVar-2] == '4' or input[findstartVar-2] == '5' or input[findstartVar-2] == '6' or input[findstartVar-2] == '7' or input[findstartVar-2] == '8' or input[findstartVar-2] == '9' or input[findstartVar-2] == '0':
+                input = input[(findstartVar - 8):]
+                break
+
+    for x in input:
+        sc1 = 0
+        sc2 = 0
+        genericCount = 0
+        charCount = charCount + 1
+        
+        if x == '\n' or x == '^M':
+            text = text + ' '
+            if switchVar == 2:
+                titlestring =titlestring + ' '
+            
+        elif x == ']':
+            
+            text = text + '|"\n'+'"'
+            titlestring = ''
+            switchVar = 1
+            for y in input[charCount:(charCount +120)]:
+                genericCount = genericCount + 1
+                sectionCheck = sectionCheck[1:] + y
+                introAbb = introAbb[1:] + y
+                if sectionCheck == 'See also':
+                    sc1 = 1
+                if introAbb == 'Jan' or introAbb =='Feb' or introAbb =='Mar' or introAbb =='Apr' or introAbb =='May' or introAbb =='Jun' or introAbb =='Jul' or introAbb =='Aug' or introAbb =='Sep' or introAbb =='Oct' or introAbb =='Nov' or introAbb =='Dec':
+                    sc2 = 1
+                if sc1 == 1 and sc2 == 1:
+                    print input[charCount:(charCount + genericCount)]
+                    switchVar = 5
+                    switchCount = genericCount-1
+                    text = text + introAbb + '.'
+                    break
+                    
+        elif switchVar == 5:
+            switchCount = switchCount -1
+            text = text + ''
+            if switchCount == 0:
+                switchVar = 1
+
+        elif x == ':':
+            text = text+'|'
+            switchVar = 2
+            
+        elif x == '.' and switchVar == 2:
+            titlestring = titlestring + x
+            text = text + x +'|' + titlestring
+            switchVar = 3
+            
+        elif x == '[':
+            text = text+'|'
+            switchVar = 4
+            
+        elif switchVar == 2:
+            titlestring = titlestring + x
+            text = text + x
+            
+        else:
+            text = text + x
+
+    for n in text:
+        pageCheck = pageCheck[1:] + n
+        pagecheckVar = pagecheckVar + 1
+        if pageCheck == 'MIDDLE EAST JOURNAL':
+            text = text[:(pagecheckVar-25)]+ text[pagecheckVar:]
+            pageCheck = 'aaaaaaaaaaaaaaaaaaa'
+            pagecheckVar = pagecheckVar - 25
+
+    for q in text:
+        pageCheck2 = pageCheck2[1:] + q
+        pagecheckVar2 = pagecheckVar2 + 1
+        if pageCheck2 == 'middle east journal':
+            text = text[:(pagecheckVar2-19)]+ text[(pagecheckVar2+6):]
+            pageCheck2 = 'aaaaaaaaaaaaaaaaaaa'
+            pagecheckVar2 = pagecheckVar2 - 25
+             
+    file = open('\\Users\\Clay\\Desktop\\PyChron\\output19.txt', 'w')
+    file.write(text)
+    file.close()
+
+            
+
